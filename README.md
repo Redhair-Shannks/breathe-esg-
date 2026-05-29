@@ -42,7 +42,8 @@ If the page is still blank, an older Django process may already be serving stale
 ```powershell
 netstat -ano | findstr ":8000"
 Stop-Process -Id <PID_FROM_LAST_COLUMN> -Force
-cd C:\Users\uditb\Documents\Codex\2026-05-28\tech-intern-assignment-breathe-esg-context\frontend
+cd breathe-esg-
+cd frontend
 npm run build
 cd ..\backend
 ..\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000

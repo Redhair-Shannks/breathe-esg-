@@ -7,12 +7,18 @@ from django.core.management.base import BaseCommand
 
 from ingestion.models import (
     ActivityRecord,
+    AuditEvent,
     EmissionFactor,
+    EmissionEstimate,
     Facility,
+    IngestionBatch,
+    RawSourceRecord,
     ReferenceMapping,
+    ReviewDecision,
     SourceSystem,
     Tenant,
     UserMembership,
+    ValidationIssue,
 )
 from ingestion.services import process_upload
 
@@ -33,7 +39,7 @@ class Command(BaseCommand):
         user.save()
 
         if options["reload"]:
-            Tenant.objects.filter(slug="acme-manufacturing").delete()
+            self._clear_demo_tenant()
 
         tenant, _ = Tenant.objects.get_or_create(slug="acme-manufacturing", defaults={"name": "ACME Manufacturing"})
         UserMembership.objects.get_or_create(user=user, tenant=tenant, defaults={"role": UserMembership.Role.ANALYST})
@@ -234,3 +240,24 @@ class Command(BaseCommand):
                 "metadata": {"note": "Illustrative seed factor; production should load the exact published factor workbook version."},
             },
         )
+
+    def _clear_demo_tenant(self):
+        tenant = Tenant.objects.filter(slug="acme-manufacturing").first()
+        if not tenant:
+            return
+
+        # Source systems are protected by ingested records, so clear lineage-bearing
+        # demo rows first. This keeps --reload repeatable without weakening the model.
+        AuditEvent.objects.filter(tenant=tenant).delete()
+        ReviewDecision.objects.filter(tenant=tenant).delete()
+        ValidationIssue.objects.filter(tenant=tenant).delete()
+        EmissionEstimate.objects.filter(activity__tenant=tenant).delete()
+        ActivityRecord.objects.filter(tenant=tenant).delete()
+        RawSourceRecord.objects.filter(tenant=tenant).delete()
+        IngestionBatch.objects.filter(tenant=tenant).delete()
+        SourceSystem.objects.filter(tenant=tenant).delete()
+        ReferenceMapping.objects.filter(tenant=tenant).delete()
+        EmissionFactor.objects.filter(tenant=tenant).delete()
+        Facility.objects.filter(tenant=tenant).delete()
+        UserMembership.objects.filter(tenant=tenant).delete()
+        tenant.delete()
