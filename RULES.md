@@ -23,6 +23,8 @@ During ingestion:
 - Rows with no issues also become `NEEDS_REVIEW`, because an analyst still needs to approve and lock them.
 - Approval changes the row to `LOCKED`.
 - Rejection changes the row to `REJECTED`.
+- `LOCKED` and `REJECTED` cannot be edited, approved, or rejected again directly.
+- Reopen is a separate action for correction workflows. It requires a note, returns the row to `NEEDS_REVIEW`, clears lock metadata, and records an `activity.reopened` audit event.
 
 ## Scope And Category Rules
 
@@ -137,4 +139,3 @@ These derived rules are intentionally conservative and should be client-configur
 - SAP Concur Expense Configuration API: https://preview.developer.concur.com/api-reference/expense/expense-config/v4.expense.config.html
 - SAP Concur Report Entry Data: https://help.sap.com/docs/CONCUR_EXPENSE/bb83754b1c5541808d50c09901e11475/d4975d91f9e04d7c96defd095e441847.html
 - SAP Concur Spend Categories: https://help.sap.com/docs/CONCUR_EXPENSE/1c6701a5b9ea4cc69eee62d00f2cf326/352423813ee84a3d912acb61edfb7114.html
-

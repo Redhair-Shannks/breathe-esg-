@@ -2,8 +2,9 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from .models import ActivityRecord, Facility, ReferenceMapping, Tenant
+from .models import ActivityRecord, Facility, IngestionBatch, ReferenceMapping, SourceSystem, Tenant
 from .parsers import infer_source_kind, normalize_quantity, parse_date, parse_sap_row, parse_travel_row, parse_utility_row
+from .services import approve_activity, reject_activity, reopen_activity, update_activity
 
 
 class ParserPrimitiveTests(TestCase):
@@ -315,3 +316,59 @@ class SourceParserTests(TestCase):
         self.assertEqual(metadata["ticket_number"], "016000000001")
         self.assertEqual(metadata["cabin_class"], "Economy")
         self.assertEqual(parsed.data["normalized_unit"], "km")
+
+
+class ReviewWorkflowTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(name="ACME", slug="acme-review")
+        self.source_system = SourceSystem.objects.create(
+            tenant=self.tenant,
+            kind=SourceSystem.Kind.SAP,
+            name="SAP export",
+        )
+        self.batch = IngestionBatch.objects.create(
+            tenant=self.tenant,
+            source_system=self.source_system,
+            source_kind=SourceSystem.Kind.SAP,
+            file_name="sap.csv",
+        )
+        self.activity = ActivityRecord.objects.create(
+            tenant=self.tenant,
+            batch=self.batch,
+            source_system=self.source_system,
+            activity_kind=ActivityRecord.ActivityKind.FUEL,
+            scope=ActivityRecord.Scope.SCOPE_1,
+            normalized_quantity=Decimal("10"),
+            normalized_unit="L",
+        )
+
+    def test_rejected_activity_is_terminal_without_reopen_flow(self):
+        reject_activity(self.activity, note="Not reportable.")
+        self.activity.refresh_from_db()
+        self.assertEqual(self.activity.review_status, ActivityRecord.ReviewStatus.REJECTED)
+
+        with self.assertRaisesMessage(ValueError, "Rejected activity cannot be approved"):
+            approve_activity(self.activity)
+
+        with self.assertRaisesMessage(ValueError, "already rejected"):
+            reject_activity(self.activity)
+
+        with self.assertRaisesMessage(ValueError, "cannot be edited"):
+            update_activity(self.activity, {"category": "Diesel fuel"})
+
+        reopen_activity(self.activity, note="Incorrect rejection.")
+        self.activity.refresh_from_db()
+        self.assertEqual(self.activity.review_status, ActivityRecord.ReviewStatus.NEEDS_REVIEW)
+
+    def test_locked_activity_can_only_change_through_reopen_flow(self):
+        approve_activity(self.activity, note="Ready for audit.")
+        self.activity.refresh_from_db()
+        self.assertEqual(self.activity.review_status, ActivityRecord.ReviewStatus.LOCKED)
+
+        with self.assertRaisesMessage(ValueError, "cannot be edited"):
+            update_activity(self.activity, {"category": "Diesel fuel"})
+
+        reopen_activity(self.activity, note="Correction requested after sign-off.")
+        self.activity.refresh_from_db()
+        self.assertEqual(self.activity.review_status, ActivityRecord.ReviewStatus.NEEDS_REVIEW)
+        self.assertIsNone(self.activity.locked_at)

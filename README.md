@@ -21,6 +21,7 @@ Prototype Django REST + React app for ingesting enterprise ESG activity data, no
 ## Local Setup
 
 ```powershell
+cd breathe-esg-
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 cd frontend

@@ -231,6 +231,10 @@ class ActivityRecord(models.Model):
     def is_locked(self):
         return self.review_status == self.ReviewStatus.LOCKED or self.locked_at is not None
 
+    @property
+    def is_terminal(self):
+        return self.is_locked or self.review_status == self.ReviewStatus.REJECTED
+
     def __str__(self):
         return f"{self.activity_kind} {self.normalized_quantity} {self.normalized_unit}"
 
@@ -371,4 +375,3 @@ class AuditEvent(models.Model):
 
     def __str__(self):
         return f"{self.event_type} at {self.created_at}"
-

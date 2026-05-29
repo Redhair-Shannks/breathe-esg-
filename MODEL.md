@@ -142,7 +142,7 @@ Review lifecycle:
 5. Analyst approves the row.
 6. Approval creates a `ReviewDecision` and locks the row by setting `review_status=LOCKED` and `locked_at`.
 
-Locked rows cannot be edited or rejected through the API.
+Locked rows cannot be edited or rejected through the API. Rejected rows are also protected: they cannot be edited or later approved through the same action path. To correct a mistake, the prototype exposes a separate reopen action that requires a note, returns the row to `NEEDS_REVIEW`, clears the lock fields if present, and writes a new audit event.
 
 The UI exposes auditability in two places:
 

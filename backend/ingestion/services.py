@@ -256,6 +256,8 @@ def process_upload(*, tenant, source_kind, uploaded_file, file_name, user=None):
 def approve_activity(activity, user=None, note=""):
     if activity.is_locked:
         raise ValueError("Activity is already locked.")
+    if activity.review_status == ActivityRecord.ReviewStatus.REJECTED:
+        raise ValueError("Rejected activity cannot be approved without reopening it.")
     blocking = activity.validation_issues.filter(
         severity=ValidationIssue.Severity.ERROR,
         status=ValidationIssue.Status.OPEN,
@@ -292,6 +294,8 @@ def approve_activity(activity, user=None, note=""):
 def reject_activity(activity, user=None, note=""):
     if activity.is_locked:
         raise ValueError("Locked activity cannot be rejected.")
+    if activity.review_status == ActivityRecord.ReviewStatus.REJECTED:
+        raise ValueError("Activity is already rejected.")
     before = {"review_status": activity.review_status}
     activity.review_status = ActivityRecord.ReviewStatus.REJECTED
     activity.save(update_fields=["review_status", "updated_at"])
@@ -314,9 +318,42 @@ def reject_activity(activity, user=None, note=""):
     return activity
 
 
+def reopen_activity(activity, user=None, note=""):
+    if not activity.is_terminal:
+        raise ValueError("Only locked or rejected activities can be reopened.")
+    if not note:
+        raise ValueError("A reopen note is required.")
+    before = {
+        "review_status": activity.review_status,
+        "locked_at": str(activity.locked_at) if activity.locked_at else None,
+        "approved_by_id": activity.approved_by_id,
+    }
+    activity.review_status = ActivityRecord.ReviewStatus.NEEDS_REVIEW
+    activity.locked_at = None
+    activity.approved_by = None
+    activity.save(update_fields=["review_status", "locked_at", "approved_by", "updated_at"])
+    ReviewDecision.objects.create(
+        tenant=activity.tenant,
+        activity=activity,
+        decision=ReviewDecision.Decision.NEEDS_INFO,
+        decided_by=user,
+        note=note,
+    )
+    AuditEvent.objects.create(
+        tenant=activity.tenant,
+        activity=activity,
+        actor=user,
+        event_type="activity.reopened",
+        before=before,
+        after={"review_status": activity.review_status, "locked_at": None, "approved_by_id": None},
+        note=note,
+    )
+    return activity
+
+
 def update_activity(activity, changes, user=None, note=""):
-    if activity.is_locked:
-        raise ValueError("Locked activity cannot be edited.")
+    if activity.is_terminal:
+        raise ValueError("Locked or rejected activity cannot be edited.")
     editable_fields = {
         "facility",
         "activity_date",

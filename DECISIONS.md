@@ -101,6 +101,7 @@ Handled:
 - emission estimate and factor used.
 - approve-and-lock.
 - reject.
+- reopen locked/rejected rows through a separate noted audit action.
 - row-level audit timeline.
 - tenant-wide audit trail modal with actor, source, row number, event type, note, and before/after payload.
 

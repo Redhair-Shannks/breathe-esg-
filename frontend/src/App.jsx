@@ -23,6 +23,7 @@ import {
   getAuditEvents,
   getBootstrap,
   getDashboard,
+  reopenActivity,
   rejectActivity,
   updateActivity,
   uploadBatch
@@ -129,8 +130,12 @@ function App() {
     try {
       if (action === "approve") {
         await approveActivity(tenant, selected.id, "Analyst sign-off from review dashboard.");
-      } else {
+      } else if (action === "reject") {
         await rejectActivity(tenant, selected.id, "Rejected during analyst review.");
+      } else {
+        const note = window.prompt("Why are you reopening this row?");
+        if (!note?.trim()) return;
+        await reopenActivity(tenant, selected.id, note.trim());
       }
       await refresh();
     } catch (error) {
@@ -393,6 +398,7 @@ function App() {
           onClose={() => setSelectedId(null)}
           onApprove={() => handleDecision("approve")}
           onReject={() => handleDecision("reject")}
+          onReopen={() => handleDecision("reopen")}
           onEdit={handleEdit}
           busy={busy}
         />
@@ -427,9 +433,11 @@ function ReadinessRow({ label, value }) {
   );
 }
 
-function ActivityDrawer({ activity, facilities, onClose, onApprove, onReject, onEdit, busy }) {
+function ActivityDrawer({ activity, facilities, onClose, onApprove, onReject, onReopen, onEdit, busy }) {
   const hasBlockingIssue = activity.validation_issues.some((issue) => issue.severity === "ERROR" && issue.status === "OPEN");
   const locked = activity.review_status === "LOCKED";
+  const rejected = activity.review_status === "REJECTED";
+  const terminal = locked || rejected;
 
   return (
     <aside className="drawer" aria-label="Activity details">
@@ -444,14 +452,20 @@ function ActivityDrawer({ activity, facilities, onClose, onApprove, onReject, on
       </div>
 
       <div className="drawer-actions">
-        <button type="button" onClick={onApprove} disabled={busy || locked || hasBlockingIssue}>
+        <button type="button" onClick={onApprove} disabled={busy || terminal || hasBlockingIssue}>
           <CheckCircle2 size={16} />
           Approve and lock
         </button>
-        <button type="button" className="secondary danger" onClick={onReject} disabled={busy || locked}>
+        <button type="button" className="secondary danger" onClick={onReject} disabled={busy || terminal}>
           <XCircle size={16} />
           Reject
         </button>
+        {terminal && (
+          <button type="button" className="secondary" onClick={onReopen} disabled={busy}>
+            <RefreshCw size={16} />
+            Reopen
+          </button>
+        )}
       </div>
 
       <section className="detail-section">
@@ -498,7 +512,7 @@ function ActivityDrawer({ activity, facilities, onClose, onApprove, onReject, on
         <h3>Normalized row</h3>
         <label>
           Facility
-          <select name="facility" defaultValue={activity.facility || ""} disabled={locked}>
+          <select name="facility" defaultValue={activity.facility || ""} disabled={terminal}>
             <option value="">No facility</option>
             {facilities.map((facility) => (
               <option value={facility.id} key={facility.id}>
@@ -509,22 +523,22 @@ function ActivityDrawer({ activity, facilities, onClose, onApprove, onReject, on
         </label>
         <label>
           Category
-          <input name="category" defaultValue={activity.category || ""} disabled={locked} />
+          <input name="category" defaultValue={activity.category || ""} disabled={terminal} />
         </label>
         <label>
           Quantity
-          <input name="normalized_quantity" defaultValue={activity.normalized_quantity || ""} disabled={locked} />
+          <input name="normalized_quantity" defaultValue={activity.normalized_quantity || ""} disabled={terminal} />
         </label>
         <label>
           Unit
-          <input name="normalized_unit" defaultValue={activity.normalized_unit || ""} disabled={locked} />
+          <input name="normalized_unit" defaultValue={activity.normalized_unit || ""} disabled={terminal} />
         </label>
         <label className="wide">
           Description
-          <textarea name="description" defaultValue={activity.description || ""} disabled={locked} />
+          <textarea name="description" defaultValue={activity.description || ""} disabled={terminal} />
         </label>
         <input type="hidden" name="note" value="Analyst edited normalized row from dashboard." />
-        <button type="submit" className="secondary" disabled={busy || locked}>
+        <button type="submit" className="secondary" disabled={busy || terminal}>
           Save changes
         </button>
       </form>

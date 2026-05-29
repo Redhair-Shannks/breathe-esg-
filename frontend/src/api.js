@@ -59,6 +59,14 @@ export function rejectActivity(tenant, id, note) {
   });
 }
 
+export function reopenActivity(tenant, id, note) {
+  return request(`/activities/${id}/reopen/?tenant=${tenant}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ note })
+  });
+}
+
 export function updateActivity(tenant, id, data) {
   return request(`/activities/${id}/?tenant=${tenant}`, {
     method: "PATCH",

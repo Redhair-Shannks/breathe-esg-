@@ -17,7 +17,7 @@ from .serializers import (
     UploadSerializer,
 )
 from .parsers import UploadFormatError
-from .services import approve_activity, dashboard_summary, get_demo_user, get_tenant, process_upload, reject_activity, update_activity
+from .services import approve_activity, dashboard_summary, get_demo_user, get_tenant, process_upload, reject_activity, reopen_activity, update_activity
 
 
 class TenantScopedMixin:
@@ -169,6 +169,15 @@ class ActivityRecordViewSet(TenantScopedMixin, viewsets.ReadOnlyModelViewSet):
         activity = self.get_object()
         try:
             reject_activity(activity, user=get_demo_user(request), note=request.data.get("note", ""))
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(ActivityRecordSerializer(activity, context=self.get_serializer_context()).data)
+
+    @action(detail=True, methods=["post"])
+    def reopen(self, request, pk=None):
+        activity = self.get_object()
+        try:
+            reopen_activity(activity, user=get_demo_user(request), note=request.data.get("note", ""))
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(ActivityRecordSerializer(activity, context=self.get_serializer_context()).data)
