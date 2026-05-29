@@ -1,0 +1,8 @@
+Report ID,Entry ID,Employee,Expense Type,Transaction Date,Amount,Currency,Origin,Destination,Distance,Distance Unit,Nights,Vendor
+R-100,E-1,Asha Rao,Airfare,2026-01-09,650.00,USD,DEN,SFO,,,,United Airlines
+R-100,E-2,Asha Rao,Hotel,2026-01-10,820.00,USD,SFO,SFO,,,3,Harbor Hotel
+R-101,E-3,Ben Kim,Taxi/Rideshare,01/12/2026,74.22,USD,SFO,SFO,18,mi,,Lyft
+R-102,E-4,Marta Vogel,Airfare,2026-01-16,1200.00,USD,BLR,LHR,,,,British Airways
+R-103,E-5,Asha Rao,Meal,2026-01-18,45.00,USD,,,,,,Airport Cafe
+R-104,E-6,Ben Kim,Hotel,2026-01-22,500.00,USD,JFK,JFK,,,0,Hilton Midtown
+

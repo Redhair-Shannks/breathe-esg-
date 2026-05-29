@@ -1,0 +1,7 @@
+Werk,Buchungsdatum,Material,Materialkurztext,Menge,ME,Bewegungsart,Belegnummer,Kostenstelle,Betrag,Währung,Lieferant,Einkaufsbeleg
+PL01,15.01.2026,100045,Diesel bulk tank refill,4250,L,201,4900001,CC-FLT,5120.00,USD,FuelCo,
+DE10,2026-01-18,300310,Steel coil 2mm,12000,KG,101,5000002,CC-MFG,15400.00,EUR,Stahl GmbH,45000077
+PL99,01/20/2026,100045,Diesel refill from unmapped plant,700,GAL,201,4900003,CC-FLT,2100.00,USD,FuelCo,
+PL01,20260121,UNMAPPED-77,Cleaning solvent purchase,20,L,101,5000004,CC-MRO,320.00,USD,Janitorial Inc,45000088
+PL01,22.01.2026,200011,Natural gas boiler feed,940,m3,201,4900005,CC-UTIL,880.00,USD,Gas Utility,
+

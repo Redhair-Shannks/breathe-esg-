@@ -1,0 +1,6 @@
+Account Number,Meter ID,Service Address,Start Date,End Date,Usage,Unit,Demand kW,Total Charge,Currency,Tariff
+A-100,MTR-DEN-001,1400 Foundry Rd Denver CO,2026-01-01,2026-01-31,58200,kWh,220,6890.25,USD,Large General Service
+A-100,MTR-DEN-001,1400 Foundry Rd Denver CO,2026-01-20,2026-02-19,181000,kWh,245,19880.10,USD,Large General Service
+A-200,MTR-CA-201,22 Market St San Francisco CA,01/01/2026,03/20/2026,44100,kWh,64,8200.15,USD,Time of Use
+A-999,MTR-UNKNOWN,Temporary leased warehouse,2026-01-01,2026-01-31,1200,kWh,8,310.50,USD,Small Commercial
+

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: breathe-esg-ingestion-prototype
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build && cd ../backend && python manage.py collectstatic --noinput
+    startCommand: cd backend && python manage.py migrate && python manage.py seed_demo --noinput && gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.14
+      - key: DEBUG
+        value: "0"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: breathe-esg-ingestion-db
+          property: connectionString
+databases:
+  - name: breathe-esg-ingestion-db
+    plan: free
+
