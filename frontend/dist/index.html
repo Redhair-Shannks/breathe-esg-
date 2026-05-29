@@ -4,12 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Breathe ESG Ingestion Review</title>
-    <link rel="stylesheet" href="/static/assets/main.css?v=1780069832142" />
+    <link rel="stylesheet" href="/static/assets/main.css?v=1780071593852" />
     <script>
       window.addEventListener("error", function (event) {
         var root = document.getElementById("root");
         if (!root) return;
-        root.innerHTML = '<div style="font-family: system-ui, sans-serif; margin: 32px; padding: 18px; border: 1px solid #f1b8b2; border-radius: 8px; color: #7a271a; background: #fff6f5;"><strong>Frontend failed to load.</strong><p style="margin: 8px 0 0;">Hard refresh with Ctrl + F5. If it still fails, open DevTools Console and check the red error.</p></div>';
+        var message = event && event.message ? event.message : "Unknown browser error";
+        root.innerHTML = '<div style="font-family: system-ui, sans-serif; margin: 32px; padding: 18px; border: 1px solid #f1b8b2; border-radius: 8px; color: #7a271a; background: #fff6f5;"><strong>Frontend failed to load.</strong><p style="margin: 8px 0 0;">' + message + '</p></div>';
       });
     </script>
   </head>
@@ -17,6 +18,6 @@
     <div id="root">
       <div style="font-family: system-ui, sans-serif; margin: 32px; color: #384758;">Loading Breathe ESG review workbench...</div>
     </div>
-    <script type="module" src="/static/assets/main.js?v=1780069832142"></script>
+    <script type="module" src="/static/assets/main.js?v=1780071593852"></script>
   </body>
 </html>

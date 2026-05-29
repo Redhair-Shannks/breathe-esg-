@@ -13,7 +13,8 @@ const html = `<!doctype html>
       window.addEventListener("error", function (event) {
         var root = document.getElementById("root");
         if (!root) return;
-        root.innerHTML = '<div style="font-family: system-ui, sans-serif; margin: 32px; padding: 18px; border: 1px solid #f1b8b2; border-radius: 8px; color: #7a271a; background: #fff6f5;"><strong>Frontend failed to load.</strong><p style="margin: 8px 0 0;">Hard refresh with Ctrl + F5. If it still fails, open DevTools Console and check the red error.</p></div>';
+        var message = event && event.message ? event.message : "Unknown browser error";
+        root.innerHTML = '<div style="font-family: system-ui, sans-serif; margin: 32px; padding: 18px; border: 1px solid #f1b8b2; border-radius: 8px; color: #7a271a; background: #fff6f5;"><strong>Frontend failed to load.</strong><p style="margin: 8px 0 0;">' + message + '</p></div>';
       });
     </script>
   </head>
