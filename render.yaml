@@ -3,7 +3,7 @@ services:
     name: breathe-esg-ingestion-prototype
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build && cd ../backend && python manage.py collectstatic --noinput
+    buildCommand: pip install -r requirements.txt && cd backend && python manage.py collectstatic --noinput
     startCommand: cd backend && python manage.py migrate && python manage.py seed_demo --noinput && gunicorn config.wsgi:application
     envVars:
       - key: PYTHON_VERSION
@@ -21,4 +21,3 @@ services:
 databases:
   - name: breathe-esg-ingestion-db
     plan: free
-

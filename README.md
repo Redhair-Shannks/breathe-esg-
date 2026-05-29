@@ -52,7 +52,9 @@ Uploads are source-specific. The analyst chooses the file source category - SAP,
 
 The repo includes `render.yaml` and `Procfile`.
 
-On Render, create from the repository using the Blueprint flow. The build installs Python dependencies, builds React, collects static assets, runs migrations, seeds demo data, and starts Gunicorn.
+On Render, create from the repository using the Blueprint flow. The build installs Python dependencies, collects the committed React static bundle, runs migrations, seeds demo data, and starts Gunicorn.
+
+When changing frontend code, run `npm run build` inside `frontend/` before committing so `frontend/dist` stays current for deployment.
 
 ## Important Docs
 

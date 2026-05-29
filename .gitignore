@@ -7,6 +7,8 @@ __pycache__/
 node_modules/
 .npm-cache/
 dist/
+!frontend/dist/
+!frontend/dist/**
 build/
 staticfiles/
 .DS_Store
