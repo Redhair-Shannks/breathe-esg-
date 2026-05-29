@@ -144,6 +144,14 @@ textarea {
   padding: 10px 12px;
 }
 
+.error-notice {
+  background: #fff6f5;
+  border-color: #f1b8b2;
+  color: #7a271a;
+  display: grid;
+  gap: 6px;
+}
+
 .metrics-grid {
   display: grid;
   gap: 12px;

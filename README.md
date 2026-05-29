@@ -35,6 +35,18 @@ cd ..\backend
 Open `http://127.0.0.1:8000`.
 
 The React app is built into `frontend/dist` and served by Django. A separate frontend dev server is not required for the demo path.
+Do not open `frontend/dist/index.html` directly or use `localhost:5173` for the normal demo; use the Django URL above. If the page looks blank after rebuilding, hard refresh the browser with `Ctrl + F5`.
+
+If the page is still blank, an older Django process may already be serving stale files on port `8000`. Stop it, rebuild, and restart from this repository:
+
+```powershell
+netstat -ano | findstr ":8000"
+Stop-Process -Id <PID_FROM_LAST_COLUMN> -Force
+cd C:\Users\uditb\Documents\Codex\2026-05-28\tech-intern-assignment-breathe-esg-context\frontend
+npm run build
+cd ..\backend
+..\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
+```
 
 ## Sample Files
 
