@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
-    "build": "esbuild src/main.jsx --bundle --outdir=dist/assets --loader:.js=jsx --loader:.jsx=jsx --loader:.css=css --minify --format=esm --splitting && node write-index.mjs",
+    "build": "esbuild src/main.jsx --bundle --outdir=dist/assets --loader:.js=jsx --loader:.jsx=jsx --loader:.css=css --jsx=automatic --minify --format=esm --splitting && node write-index.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
